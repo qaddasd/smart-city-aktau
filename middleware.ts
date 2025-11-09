@@ -26,8 +26,13 @@ export async function middleware(req: NextRequest) {
     },
   )
 
-  const { data: { session } } = await (supabase as any).auth.getSession()
-  const user = session?.user || null
+  let user: any = null
+  try {
+    const { data, error } = await (supabase as any).auth.getSession()
+    if (!error) {
+      user = data?.session?.user ?? null
+    }
+  } catch {}
 
   const pathname = req.nextUrl.pathname
   const isAuthPage = pathname === "/login" || pathname === "/register"
