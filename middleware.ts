@@ -1,35 +1,30 @@
-import { createServerClient, type CookieOptions } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
 export async function middleware(req: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: req.headers,
-    },
-  })
-
   const pathname = req.nextUrl.pathname
   const isAuthPage = pathname === "/login" || pathname === "/register"
   const protectedPrefixes = ["/dashboard", "/profile", "/submissions", "/analytics", "/map", "/admin"]
   const isProtected = protectedPrefixes.some((p) => pathname.startsWith(p))
 
-  const hasSession = Array.from(req.cookies.getAll()).some(
-    cookie => cookie.name.startsWith('sb-') && cookie.name.includes('auth-token')
-  )
+  let hasSession = false
+  try {
+    const cookies = req.cookies.getAll()
+    hasSession = cookies.some(cookie => 
+      cookie.name.startsWith('sb-') && cookie.name.includes('auth-token')
+    )
+  } catch (e) {
+    hasSession = false
+  }
 
   if (!hasSession && isProtected) {
-    const url = req.nextUrl.clone()
-    url.pathname = "/login"
-    return NextResponse.redirect(url)
+    return NextResponse.redirect(new URL("/login", req.url))
   }
 
   if (hasSession && isAuthPage) {
-    const url = req.nextUrl.clone()
-    url.pathname = "/dashboard"
-    return NextResponse.redirect(url)
+    return NextResponse.redirect(new URL("/dashboard", req.url))
   }
 
-  return response
+  return NextResponse.next()
 }
 
 export const config = {
