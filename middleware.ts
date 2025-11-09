@@ -9,7 +9,7 @@ export async function middleware(req: NextRequest) {
   let hasAuth = false
   try {
     const names = req.cookies.getAll().map((c) => c.name)
-    hasAuth = names.some((n) => /^sb-[^-]+-auth-token(\.1)?$/.test(n))
+    hasAuth = names.some((n) => /^sb-[a-z0-9]+-auth-token(\.\d+)?$/i.test(n))
   } catch {}
 
   if (!hasAuth && isProtected) {
