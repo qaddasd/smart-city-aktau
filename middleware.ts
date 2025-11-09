@@ -1,59 +1,41 @@
-import { createServerClient, type CookieOptions } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
 export async function middleware(req: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: req.headers,
-    },
-  })
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return req.cookies.get(name)?.value
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          response.cookies.set({ name, value, ...options })
-        },
-        remove(name: string, options: CookieOptions) {
-          response.cookies.set({ name, value: "", ...options })
-        },
-      },
-    },
-  )
-
-  let user: any = null
-  try {
-    const { data, error } = await (supabase as any).auth.getSession()
-    if (!error) {
-      user = data?.session?.user ?? null
-    }
-  } catch {}
-
   const pathname = req.nextUrl.pathname
   const isAuthPage = pathname === "/login" || pathname === "/register"
   const protectedPrefixes = ["/dashboard", "/profile", "/submissions", "/analytics", "/map", "/admin"]
   const isProtected = protectedPrefixes.some((p) => pathname.startsWith(p))
 
-  if (!user && isProtected) {
+  let hasAuth = false
+  try {
+    const names = req.cookies.getAll().map((c) => c.name)
+    hasAuth = names.some((n) => /^sb-[^-]+-auth-token(\.1)?$/.test(n))
+  } catch {}
+
+  if (!hasAuth && isProtected) {
     const url = req.nextUrl.clone()
     url.pathname = "/login"
     return NextResponse.redirect(url)
   }
 
-  if (user && isAuthPage) {
+  if (hasAuth && isAuthPage) {
     const url = req.nextUrl.clone()
     url.pathname = "/dashboard"
     return NextResponse.redirect(url)
   }
 
-  return response
+  return NextResponse.next()
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  matcher: [
+    "/login",
+    "/register",
+    "/dashboard/:path*",
+    "/profile/:path*",
+    "/submissions/:path*",
+    "/analytics",
+    "/map",
+    "/admin/:path*",
+  ],
 }
