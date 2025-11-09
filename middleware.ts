@@ -1,43 +1,55 @@
+import { createServerClient, type CookieOptions } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
 export async function middleware(req: NextRequest) {
-  try {
-    const pathname = req.nextUrl.pathname
-    const isAuthPage = pathname === "/login" || pathname === "/register"
-    const protectedPrefixes = ["/dashboard", "/profile", "/submissions", "/analytics", "/map", "/admin"]
-    const isProtected = protectedPrefixes.some((p) => pathname.startsWith(p))
+  let response = NextResponse.next({
+    request: {
+      headers: req.headers,
+    },
+  })
 
-    let hasAuth = false
-    try {
-      const names = req.cookies.getAll().map((c) => c.name)
-      hasAuth = names.some((n) => /^sb-[a-z0-9]+-auth-token(\.\d+)?$/i.test(n))
-    } catch {}
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return req.cookies.get(name)?.value
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          response.cookies.set({ name, value, ...options })
+        },
+        remove(name: string, options: CookieOptions) {
+          response.cookies.set({ name, value: "", ...options })
+        },
+      },
+    },
+  )
 
-    if (!hasAuth && isProtected) {
-      const url = new URL("/login", req.url)
-      return NextResponse.redirect(url)
-    }
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-    if (hasAuth && isAuthPage) {
-      const url = new URL("/dashboard", req.url)
-      return NextResponse.redirect(url)
-    }
+  const pathname = req.nextUrl.pathname
+  const isAuthPage = pathname === "/login" || pathname === "/register"
+  const protectedPrefixes = ["/dashboard", "/profile", "/submissions", "/analytics", "/map", "/admin"]
+  const isProtected = protectedPrefixes.some((p) => pathname.startsWith(p))
 
-    return NextResponse.next()
-  } catch {
-    return NextResponse.next()
+  if (!user && isProtected) {
+    const url = req.nextUrl.clone()
+    url.pathname = "/login"
+    return NextResponse.redirect(url)
   }
+
+  if (user && isAuthPage) {
+    const url = req.nextUrl.clone()
+    url.pathname = "/dashboard"
+    return NextResponse.redirect(url)
+  }
+
+  return response
 }
 
 export const config = {
-  matcher: [
-    "/login",
-    "/register",
-    "/dashboard/:path*",
-    "/profile/:path*",
-    "/submissions/:path*",
-    "/analytics",
-    "/map",
-    "/admin/:path*",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
 }
