@@ -26,23 +26,24 @@ export async function middleware(req: NextRequest) {
     },
   )
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  const user = session?.user
+  await supabase.auth.getUser()
 
   const pathname = req.nextUrl.pathname
   const isAuthPage = pathname === "/login" || pathname === "/register"
   const protectedPrefixes = ["/dashboard", "/profile", "/submissions", "/analytics", "/map", "/admin"]
   const isProtected = protectedPrefixes.some((p) => pathname.startsWith(p))
 
-  if (!user && isProtected) {
+  const hasSession = Array.from(req.cookies.getAll()).some(
+    cookie => cookie.name.startsWith('sb-') && cookie.name.includes('auth-token')
+  )
+
+  if (!hasSession && isProtected) {
     const url = req.nextUrl.clone()
     url.pathname = "/login"
     return NextResponse.redirect(url)
   }
 
-  if (user && isAuthPage) {
+  if (hasSession && isAuthPage) {
     const url = req.nextUrl.clone()
     url.pathname = "/dashboard"
     return NextResponse.redirect(url)
