@@ -26,7 +26,7 @@ export async function middleware(req: NextRequest) {
     },
   )
 
-  const { data: { session } } = await supabase.auth.getSession()
+  const { data: { session } } = await (supabase as any).auth.getSession()
   const user = session?.user || null
 
   const pathname = req.nextUrl.pathname
