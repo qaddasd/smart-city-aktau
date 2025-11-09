@@ -1,14 +1,22 @@
 import { NextResponse } from "next/server"
 import Cerebras from '@cerebras/cerebras_cloud_sdk'
 
-const cerebras = new Cerebras({
-  apiKey: 'csk-k2tvyk823efkyjvx45d2wywwprptkmw3er9x8j4xm32v8ekv'
-})
-
 export async function POST(req: Request) {
   try {
     const body = await req.json()
     const { weather, traffic, busDelay, time } = body
+
+    const apiKey = process.env.CEREBRAS_API_KEY
+    const missingKeyFallback = {
+      ru: `Температура ${weather?.temp || 0}°C, пробки ${traffic?.congestion || 0}%. Рекомендуем выехать чуть раньше и следить за обновлениями трафика.`,
+      kz: `Температура ${weather?.temp || 0}°C, жол тығындары ${traffic?.congestion || 0}%. Сәл ертерек шыққан дұрыс және трафик жаңартуларын қадағалаңыз.`,
+    }
+
+    if (!apiKey) {
+      return NextResponse.json({ recommendation: missingKeyFallback })
+    }
+
+    const cerebras = new Cerebras({ apiKey })
 
     const systemPrompt = `Ты — умный городской ассистент для жителей Актау, Казахстан.
 
