@@ -128,6 +128,156 @@ export default function NewsPage() {
     return out
   }
 
+  function generateMangystauNews(language: "ru" | "kz"): NewsItem[] {
+    const now = new Date()
+    const date = now.toISOString().slice(0,10)
+    const time = now.toTimeString().slice(0,5)
+
+    const base = [
+      {
+        category: "event" as const,
+        priority: "medium" as const,
+        location: "Актау, набережная 15 мкр",
+        ru: {
+          title: "Вечерний концерт на набережной",
+          description: "На набережной 15 мкр пройдёт бесплатный вечерний концерт местных музыкантов. Начало в 19:30, организаторы рекомендуют приходить заранее.",
+        },
+        kz: {
+          title: "Теңіз жағалауындағы кешкі концерт",
+          description: "15-шағын аудандағы теңіз жағалауында жергілікті музыканттардың тегін кешкі концерті өтеді. Басталуы 19:30, ертерек келу ұсынылады.",
+        },
+      },
+      {
+        category: "event" as const,
+        priority: "medium" as const,
+        location: "Актау, городской парк",
+        ru: {
+          title: "Семейный фестиваль в городском парке",
+          description: "В городском парке Актау пройдёт семейный фестиваль с мастер-классами, фуд-кортом и детской программой. Вход свободный, начало в 12:00.",
+        },
+        kz: {
+          title: "Қалалық саябақтағы отбасылық фестиваль",
+          description: "Ақтау қалалық саябағында шеберлік сабақтары, фуд-корты және балалар бағдарламасы бар отбасылық фестиваль өтеді. Кіру тегін, басталуы 12:00.",
+        },
+      },
+      {
+        category: "event" as const,
+        priority: "medium" as const,
+        location: "Мангистауский областной музей",
+        ru: {
+          title: "Выставка местных художников",
+          description: "В Мангистауском областном музее открывается выставка картин и фотографий местных художников. Экспозиция будет работать в течение двух недель.",
+        },
+        kz: {
+          title: "Жергілікті суретшілер көрмесі",
+          description: "Маңғыстау облыстық музейінде жергілікті суретшілердің картиналары мен фотосуреттер көрмесі ашылады. Экспозиция екі апта бойы жұмыс істейді.",
+        },
+      },
+      {
+        category: "event" as const,
+        priority: "low" as const,
+        location: "Побережье Каспийского моря",
+        ru: {
+          title: "Эко-субботник на побережье",
+          description: "Волонтёры Мангистау организуют эко-субботник на побережье Каспия. Желающим просят взять перчатки и удобную одежду.",
+        },
+        kz: {
+          title: "Каспий жағалауындағы эко-сенбілік",
+          description: "Маңғыстау еріктілері Каспий жағалауында эко-сенбілік өткізеді. Қатысушылардан қолғап пен ыңғайлы киім алып келу сұралады.",
+        },
+      },
+      {
+        category: "event" as const,
+        priority: "medium" as const,
+        location: "Актау, коворкинг-центр",
+        ru: {
+          title: "Встреча IT-сообщества Мангистау",
+          description: "В одном из коворкингов Актау пройдёт неформальная встреча IT-специалистов региона. В программе — короткие выступления и свободное общение.",
+        },
+        kz: {
+          title: "Маңғыстау IT қауымдастығының кездесуі",
+          description: "Ақтаудағы коворкингтердің бірінде өңірдің IT мамандарының еркін кездесуі өтеді. Бағдарламада қысқа баяндама және еркін қарым-қатынас бар.",
+        },
+      },
+      {
+        category: "event" as const,
+        priority: "medium" as const,
+        location: "Актау, набережная",
+        ru: {
+          title: "Утренний забег вдоль набережной",
+          description: "Для любителей спорта в Актау организуют утренний забег вдоль набережной. Регистрация участников открыта онлайн.",
+        },
+        kz: {
+          title: "Жағалау бойымен таңғы жүгіру",
+          description: "Спорт сүйер қауым үшін Ақтауда жағалау бойымен таңғы жүгіру ұйымдастырылады. Қатысушыларды онлайн тіркеу ашық.",
+        },
+      },
+      {
+        category: "infrastructure" as const,
+        priority: "high" as const,
+        location: "Трасса Актау – Жетыбай",
+        ru: {
+          title: "Ремонт участка трассы Актау – Жетыбай",
+          description: "На одном из участков трассы Актау – Жетыбай ведутся дорожные работы, возможны временные заторы. Водителям рекомендуют планировать маршрут заранее.",
+        },
+        kz: {
+          title: "Ақтау – Жетібай трассасындағы жөндеу жұмыстары",
+          description: "Ақтау – Жетібай трассасының бір бөлігінде жол жөндеу жұмыстары жүріп жатыр, уақытша кептелістер болуы мүмкін. Жүргізушілерге маршрутты алдын ала жоспарлау ұсынылады.",
+        },
+      },
+      {
+        category: "infrastructure" as const,
+        priority: "medium" as const,
+        location: "Актау, новые автобусные маршруты",
+        ru: {
+          title: "Запуск дополнительных автобусных рейсов",
+          description: "В Актау запускают дополнительные автобусные рейсы в часы пик между микрорайонами и центром. Это должно сократить время ожидания на остановках.",
+        },
+        kz: {
+          title: "Қосымша автобус рейстері іске қосылды",
+          description: "Ақтауда микроаудандар мен орталық арасындағы қарбалас уақытта қосымша автобус рейстері іске қосылады. Бұл аялдамалардағы күту уақытын қысқартуға тиіс.",
+        },
+      },
+      {
+        category: "alert" as const,
+        priority: "high" as const,
+        location: "Береговая линия Мангистау",
+        ru: {
+          title: "Штормовое предупреждение на побережье",
+          description: "Синоптики объявили штормовое предупреждение на побережье Мангистау. Жителям советуют ограничить выход к воде и быть осторожнее на дороге.",
+        },
+        kz: {
+          title: "Маңғыстау жағалауында дауылды ескерту",
+          description: "Синоптиктер Маңғыстау жағалауында дауылды ескерту жариялады. Тұрғындарға суға жақындауды шектеу және жолда сақ болу ұсынылады.",
+        },
+      },
+      {
+        category: "event" as const,
+        priority: "medium" as const,
+        location: "Долина шаров, Турыш",
+        ru: {
+          title: "Экскурсии в Долину шаров",
+          description: "Туристические компании Мангистау усиливают программу выездных экскурсий в Долину шаров. Для группы предусмотрен трансфер из Актау.",
+        },
+        kz: {
+          title: "Шарлар аңғарына экскурсиялар",
+          description: "Маңғыстау туристік компаниялары Шарлар аңғарына выезд экскурсияларын күшейтеді. Топқа Ақтаудан трансфер қарастырылған.",
+        },
+      },
+    ]
+
+    return base.map((item, idx) => ({
+      id: 20000 + idx,
+      title: language === "ru" ? item.ru.title : item.kz.title,
+      description: language === "ru" ? item.ru.description : item.kz.description,
+      category: item.category,
+      date,
+      time,
+      location: item.location,
+      priority: item.priority,
+    }))
+  }
+
   function nearestArea(areas: any[], lat:number, lon:number) {
     if (!areas || areas.length === 0) return null
     let best:any = null; let bd = Infinity
@@ -182,6 +332,7 @@ export default function NewsPage() {
         [n.title, n.description, n.location || ""].some((f) => (f || "").toLowerCase().includes(q)),
       )
     : filteredByCat
+  const eventNews = generateMangystauNews(language)
 
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -275,6 +426,54 @@ export default function NewsPage() {
               )
             })}
           </div>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.35 }}
+          className="mb-8"
+        >
+          {eventNews.length > 0 && (
+            <div className="bg-white rounded-2xl p-5 md:p-6 shadow-sm border border-neutral-100">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-black">
+                    {language === "ru" ? "Афиша мероприятий" : "Іс-шаралар афишасы"}
+                  </h2>
+                  <p className="text-xs text-neutral-500 mt-1">
+                    {language === "ru"
+                      ? "Ближайшие события в Актау и Мангистау"
+                      : "Ақтау мен Маңғыстаудағы алдағы іс-шаралар"}
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {eventNews.map((news) => (
+                  <button
+                    key={news.id}
+                    onClick={() => setSelectedNews(news)}
+                    className="text-left group"
+                  >
+                    <div className="mb-2 flex items-center gap-2 text-xs text-neutral-500">
+                      <Calendar className="h-3.5 w-3.5" />
+                      <span>{news.date}</span>
+                      <span>·</span>
+                      <span>{news.time}</span>
+                    </div>
+                    <div className="font-semibold text-sm text-black line-clamp-2 group-hover:underline">
+                      {news.title}
+                    </div>
+                    {news.location && (
+                      <div className="mt-1 flex items-center gap-1 text-[11px] text-neutral-500">
+                        <MapPin className="h-3 w-3" />
+                        <span className="truncate">{news.location}</span>
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </motion.div>
         <motion.div
           initial={{ opacity: 0 }}
@@ -391,6 +590,16 @@ export default function NewsPage() {
                   <X className="h-6 w-6 text-neutral-600" />
                 </motion.button>
               </div>
+
+              {selectedNews.image && (
+                <div className="mb-6">
+                  <img
+                    src={selectedNews.image}
+                    alt={selectedNews.title}
+                    className="w-full max-h-80 rounded-2xl object-cover"
+                  />
+                </div>
+              )}
 
               <div className="flex items-center gap-6 text-sm text-neutral-600 mb-6">
                 <div className="flex items-center gap-2">

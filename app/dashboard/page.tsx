@@ -409,6 +409,21 @@ export default function DashboardPage() {
                   </div>
                 </div>
               )}
+              {recommendation && (
+                <div className="mt-4 bg-neutral-50 border border-neutral-200 rounded-xl p-3 text-xs text-neutral-700 flex items-start gap-2">
+                  <Sparkles className="h-4 w-4 text-black mt-0.5" />
+                  <div>
+                    <div className="font-medium mb-1">
+                      {language === "ru"
+                        ? "AI-обзор: одежда и предупреждения"
+                        : "AI шолу: киім және ескертулер"}
+                    </div>
+                    <p className="leading-relaxed line-clamp-3">
+                      {language === "ru" ? recommendation.ru : recommendation.kz}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </motion.div>
           <motion.div
